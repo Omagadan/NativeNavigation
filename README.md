@@ -1,79 +1,135 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Travel Booking App
 
-# Getting Started
+## Resumen de la App y sus Funcionalidades
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+**Travel Booking App** es una aplicación diseñada para que los usuarios exploren destinos turísticos, reserven viajes y administren su perfil y configuraciones. Entre las características clave se incluyen:
 
-## Step 1: Start the Metro Server
+- **Listado de destinos:** Permite al usuario explorar destinos disponibles.
+- **Detalle del destino:** Información detallada de cada destino, con imágenes, descripciones y precios.
+- **Flujo de autenticación:** Inicio de sesión y registro para acceder a características personalizadas.
+- **Búsqueda:** Filtrado y búsqueda avanzada de destinos.
+- **Notificaciones:** Apartado para mostrar alertas, ofertas y recordatorios.
+- **Perfil y Configuraciones:** El usuario puede modificar su información personal y preferencias.
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+## Estructura de la Navegación
 
-To start Metro, run the following command from the _root_ of your React Native project:
+La navegación hace uso de React Navigation con múltiples niveles de anidación:
 
-```bash
-# using npm
-npm start
+- **Root Navigator (Stack):**  
+  Determina si el usuario ve el flujo de autenticación o el contenido principal, según su estado de autenticación.
+  
+  - **Auth Navigator (Stack):**
+    - **Login**
+    - **Register**
+  
+  - **App Navigator (Drawer):**
+    - **HomeTabs (Bottom Tabs):**
+      - **FeedStack (Stack):**
+        - Home (destinos principales)
+        - Details (detalle del destino)
+      - **SearchStack (Stack):**
+        - Search (búsqueda de destinos)
+        - Details (detalle del destino desde resultados)
+      - **Notifications (Screen)**
+    - **Profile (Screen)**
+    - **Settings (Screen)**
 
-# OR using Yarn
-yarn start
-```
+La jerarquía es:
+`RootStack`  
+└── si no autenticado → `AuthStack` (Login/Register)  
+└── si autenticado → `AppDrawer` (incluye `HomeTabs`, `Profile`, `Settings`)
 
-## Step 2: Start your Application
+En `HomeTabs`: `FeedStack` & `SearchStack` anidan sus propias pantallas.
 
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
+## Personalizaciones en Componentes de Navegación
 
-### For Android
+- **Headers personalizados:** Títulos con estilos propios, potencialmente íconos o botones de acción.
+- **Íconos en Bottom Tabs:** Con `react-native-vector-icons`, se agregaron íconos claros y atractivos para cada tab, con cambios de color en estado activo/inactivo.
+- **Deep Linking:** Configuración para que la app responda a enlaces externos (ejemplo: `travelbookingapp://register`).
+- **Animaciones personalizadas:** Ajuste de transiciones entre pantallas usando las opciones del Stack Navigator.
 
-```bash
-# using npm
-npm run android
+## Optimización de Rendimiento
 
-# OR using Yarn
-yarn android
-```
+- **Lazy Loading de Pantallas:** Carga diferida de pantallas para mejorar el tiempo de inicio.
+- **Memoización:** Uso de `React.memo`, `useMemo` y `useCallback` para prevenir renders innecesarios.
+- **Code Splitting:** División del código para que solo se carguen las partes necesarias en el arranque.
+- **Optimización de Recursos:** Uso de imágenes ligeras y estrategias de caché.
 
-### For iOS
+## Enfoque de Manejo de Estado
 
-```bash
-# using npm
-npm run ios
+- **Context API:**
+  - **AuthContext:** Mantiene el estado `isAuthenticated` y funciones `login()` y `logout()`.
+  
+Este enfoque evita la necesidad de librerías adicionales y mantiene el control de estado simple y centralizado.
 
-# OR using Yarn
-yarn ios
-```
+## Desafíos y Cómo se Abordaron
 
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
+- **Deep Linking en iOS/Android:**  
+  Inicialmente, el deeplink no llevaba a la pantalla correcta. Se resolvió garantizando la carga del URL inicial antes de montar el `NavigationContainer` y ajustando la configuración de `linking.config`.
 
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
+- **Navegación Anidada Compleja:**  
+  Diseñar la estructura con múltiples niveles requirió cuidado. Se separaron navegadores en diferentes archivos y se definió cuidadosamente el `linking.config` para mantener claridad.
 
-## Step 3: Modifying your App
+- **Rendimiento:**  
+  La carga inicial era algo lenta, por lo que se aplicaron lazy loading, memoización y code splitting.
 
-Now that you have successfully run the app, let's modify it.
+## Instrucciones para Ejecutar la App
 
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
+1. **Clonar el repositorio:**
+   ```bash
+   git clone https://github.com/tu-usuario/TravelBookingApp.git
+   cd TravelBookingApp
+   ```
 
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
+2. **Instalar Dependencias**
 
-## Congratulations! :tada:
+   ```bash
+   npm install
+   ```
+   o
 
-You've successfully run and modified your React Native App. :partying_face:
+   ```bash
+   yarn install
+   ```
 
-### Now what?
+3. **Instalar Pods (iOS)**
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
+   ```bash
+   cd ios
+   pod install
+   cd ..
+   ```
 
-# Troubleshooting
+4. **Ejecutar la App**
 
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+   - iOS (simulador)
 
-# Learn More
+   ```bash
+   npx react-native run-ios
+   ```
 
-To learn more about React Native, take a look at the following resources:
+   - Android (emulador/dispositivo)
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+   ```bash
+   npx react-native run-android
+   ```
+
+5. Probar Deep Linking
+
+   - iOS
+
+   ```bash
+   xcrun simctl openurl booted travelbookingapp://register
+   ```
+
+   - Android
+
+   ```bash
+   adb shell am start -W -a android.intent.action.VIEW -d "travelbookingapp://register" com.tu.paquete
+   ```
+
+Esto abrirá la app directamente en la pantalla Register, asumiendo que la configuración del linking y el estado de autenticación estén correctamente establecidos.
+
+## Evidencia
+
+![./RM-img.gif](RM-img.gif)
